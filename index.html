@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <title>Insignificant Digits</title>
 
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@300;500;700;900&family=Inter:wght@400;500;600&display=swap">
@@ -76,7 +76,9 @@
     .wordmark{
       left: 50%;
       right: auto;
-      bottom: clamp(72px, 16vh, 160px);
+      /* clamp() plus the home-indicator safe-area inset, so it clears both
+         the bottom of the screen and iOS's gesture bar. */
+      bottom: calc(clamp(110px, 24vh, 220px) + env(safe-area-inset-bottom, 0px));
       transform: translateX(-50%);
     }
 
@@ -201,6 +203,15 @@
   var isMobile = false;
   var columns = [];
   var rafId = null;
+
+  // The width/height the current set of columns was actually built for.
+  // Mobile browsers fire 'resize' constantly as the address bar shows and
+  // hides while scrolling, even though the page hasn't really changed size —
+  // rebuilding the whole vine on every one of those would make the
+  // animation look like it keeps restarting. So layout is only rebuilt when
+  // the size has changed by a meaningful amount (a real resize or rotation),
+  // not for that address-bar jitter.
+  var builtW = 0, builtH = 0;
 
   // How many flowers may be mid-fall at once, across the whole page.
   var MAX_FALLING = 2;
@@ -336,8 +347,9 @@
         slot.rotFlat = rand(-5, 5);
         break;
       case 'land':
-        // Shapes accumulate on the ground for quite a while before dissolving.
-        slot.landDuration = rand(16000, 30000);
+        // Shapes rest on the ground for good once they land — this phase
+        // never times out, so they never advance to 'fadeout'.
+        slot.landDuration = Infinity;
         // Self-heal: usable whether we arrived here via a real fall, or were
         // seeded directly into 'land' at page-load for initial variety.
         if (typeof slot.fallToX !== 'number'){
@@ -613,7 +625,17 @@
     canvas.style.width = W + 'px';
     canvas.style.height = H + 'px';
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    buildColumns();
+
+    // Only rebuild the vine layout (which resets every flower to dormant)
+    // on a real size change, not on the small height wobble mobile browser
+    // chrome causes while scrolling.
+    var widthChanged = Math.abs(W - builtW) > 2;
+    var heightChanged = Math.abs(H - builtH) > 120;
+    if (columns.length === 0 || widthChanged || heightChanged){
+      buildColumns();
+      builtW = W;
+      builtH = H;
+    }
   }
 
   function renderStatic(){
