@@ -70,6 +70,21 @@
     height: auto;
   }
 
+  /* On narrow screens the corner-anchored wordmark gets lost in the busier,
+     more vertical layout, so it moves to a centered spot higher up instead. */
+  @media (max-width: 700px){
+    .wordmark{
+      left: 50%;
+      right: auto;
+      bottom: clamp(72px, 16vh, 160px);
+      transform: translateX(-50%);
+    }
+
+    .wordmark img{
+      width: clamp(230px, 62vw, 380px);
+    }
+  }
+
   /* ---------- listen section ---------- */
   /* Rises up over the fixed vine background as the page scrolls, so the
      animation stays visible behind it like a permanent backdrop. */
@@ -183,6 +198,7 @@
   var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   var W = 0, H = 0, dpr = 1;
+  var isMobile = false;
   var columns = [];
   var rafId = null;
 
@@ -195,7 +211,8 @@
   var ANIMATION_START = performance.now();
   var BURST_WINDOW_MS = 7000;
 
-  // Every hexagon is drawn at this same fixed size.
+  // Every hexagon is drawn at this same fixed size (a touch smaller on
+  // narrow/mobile screens, set in setupCanvas).
   var HEX_SIZE = 13;
 
   // navy (top of vine) -> pale sky (bottom of vine)
@@ -405,12 +422,15 @@
     var spacing = Math.max(7, HEX_SIZE * 2 * spacingFactor);
     var numRows = Math.max(6, Math.round(vineLength / spacing));
     // The vine is wide and busy near the top, and tapers down to a narrow,
-    // sparse tip toward its lower end.
-    var topSpread = rand(2.9, 3.4);
-    var tipSpread = rand(0.22, 0.4);
-    // About five shapes wide at the top, tapering to one or two at the tip.
-    var maxShapesPerRow = randInt(5, 6);
-    var tipShapesPerRow = randInt(1, 2);
+    // sparse tip toward its lower end. Narrower on mobile so neighboring
+    // vines (which sit closer together on a slim screen) stay visually
+    // distinct instead of merging into a solid mass.
+    var topSpread = isMobile ? rand(1.7, 2.1) : rand(2.9, 3.4);
+    var tipSpread = isMobile ? rand(0.18, 0.3) : rand(0.22, 0.4);
+    // About five shapes wide at the top, tapering to one or two at the tip
+    // (fewer on mobile, to keep the total shape count in check).
+    var maxShapesPerRow = isMobile ? randInt(3, 4) : randInt(5, 6);
+    var tipShapesPerRow = isMobile ? 1 : randInt(1, 2);
     var slots = [];
     for (var s = 0; s < numRows; s++){
       var tpos = numRows === 1 ? 0 : s / (numRows - 1);
@@ -479,19 +499,26 @@
   function buildColumns(){
     columns = [];
     fallingCount = 0;
-    // Fewer, wider-spaced vines, each with more room to spread out.
-    var colWidth = 145;
-    var count = Math.max(6, Math.round(W / colWidth));
+    // Fewer, wider-spaced vines, each with more room to spread out. On
+    // narrow/mobile screens the vines themselves are also narrower (see
+    // makeColumn), so a smaller minimum count still leaves clear gaps
+    // between them instead of merging into one dense mass.
+    var colWidth = isMobile ? 130 : 145;
+    var count = Math.max(isMobile ? 3 : 6, Math.round(W / colWidth));
     groundY = computeGroundY();
     for (var i = 0; i < count; i++){
       var x = (i + 0.5) * (W / count) + rand(-8, 8);
       columns.push(makeColumn(x, groundY));
     }
-    // Filler shapes in the gaps between (and just outside) the vines.
-    for (var g = 0; g <= count; g++){
-      var gapX = g * (W / count);
-      var filler = makeFillerColumn(gapX, groundY);
-      if (filler){ columns.push(filler); }
+    // Filler shapes in the gaps between (and just outside) the vines. Skipped
+    // on mobile, where the vines already sit close together and the extra
+    // shapes just read as clutter rather than "in-between" texture.
+    if (!isMobile){
+      for (var g = 0; g <= count; g++){
+        var gapX = g * (W / count);
+        var filler = makeFillerColumn(gapX, groundY);
+        if (filler){ columns.push(filler); }
+      }
     }
   }
 
@@ -578,6 +605,8 @@
     var rect = heroEl.getBoundingClientRect();
     W = Math.max(1, Math.floor(rect.width));
     H = Math.max(1, Math.floor(rect.height));
+    isMobile = W < 700;
+    HEX_SIZE = isMobile ? 11 : 13;
     dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
     canvas.width = Math.floor(W * dpr);
     canvas.height = Math.floor(H * dpr);
