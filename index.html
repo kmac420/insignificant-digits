@@ -158,6 +158,50 @@
     text-decoration: underline;
   }
 
+  .track-links{
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 2px 0;
+  }
+
+  .track-links-label{
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-light);
+    margin-right: 2px;
+  }
+
+  .track-link-icon{
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    flex: 0 0 auto;
+    border-radius: 50%;
+    background: var(--brand, var(--ink-light));
+    color: #fff;
+    box-shadow: 0 1px 2px rgba(20, 26, 46, 0.12);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  .track-link-icon svg{
+    width: 15px;
+    height: 15px;
+    fill: currentColor;
+    display: block;
+  }
+
+  .track-link-icon:hover,
+  .track-link-icon:focus-visible{
+    transform: translateY(-1px) scale(1.07);
+    box-shadow: 0 4px 12px rgba(20, 26, 46, 0.2);
+  }
+
   .site-footer{
     margin: clamp(32px, 6vh, 56px) 0 0;
     text-align: center;
@@ -211,13 +255,23 @@
   // browser's address bar) and a `title`. Every entry renders as its own
   // player automatically, in order -- no other markup needs to change.
   //
-  // (The first entry also carries `embedUrl`, a SoundCloud-resolved form
+  // (The last entry also carries `embedUrl`, a SoundCloud-resolved form
   // of the same track kept from the original embed code. That field is
   // optional -- for a new track, `permalink` alone is enough.)
+  //
+  // To add streaming links (Apple Music, Spotify, YouTube Music) below a
+  // track's player, add a `links` object with any of `appleMusic`,
+  // `spotify`, `youtubeMusic` -- only the ones present are shown, in that
+  // order. Omit `links` entirely for a track with no streaming links yet.
   var TRACKS = [
     {
       title: 'Sunny Side',
-      permalink: 'https://soundcloud.com/insignificant-digits/sunny-side'
+      permalink: 'https://soundcloud.com/insignificant-digits/sunny-side',
+      links: {
+        appleMusic: 'https://music.apple.com/ca/album/sunny-side/6820128998?i=6820129008',
+        spotify: 'https://open.spotify.com/track/7owvqM8sZMrV9fNGR9nhHL?si=83ef9abcbabc4f85',
+        youtubeMusic: 'https://music.youtube.com/watch?v=hzZL4ScVUx8&si=aq_wBKVy9ksOmUja'
+      }
     },
     {
       title: 'Nine Volt',
@@ -246,6 +300,49 @@
       .replace(/"/g, '&quot;');
   }
 
+  // Official brand glyphs (path data) and brand colors, so each streaming
+  // link renders as that service's own recognizable icon rather than a
+  // plain text link. Source: the Simple Icons project (simpleicons.org),
+  // which tracks each company's current official logo mark.
+  var STREAM_LINK_ORDER = [
+    {
+      key: 'appleMusic',
+      label: 'Apple Music',
+      color: '#FA243C',
+      icon: '<path d="M23.994 6.124a9.23 9.23 0 00-.24-2.19c-.317-1.31-1.062-2.31-2.18-3.043a5.022 5.022 0 00-1.877-.726 10.496 10.496 0 00-1.564-.15c-.04-.003-.083-.01-.124-.013H5.986c-.152.01-.303.017-.455.026-.747.043-1.49.123-2.193.4-1.336.53-2.3 1.452-2.865 2.78-.192.448-.292.925-.363 1.408-.056.392-.088.785-.1 1.18 0 .032-.007.062-.01.093v12.223c.01.14.017.283.027.424.05.815.154 1.624.497 2.373.65 1.42 1.738 2.353 3.234 2.801.42.127.856.187 1.293.228.555.053 1.11.06 1.667.06h11.03a12.5 12.5 0 001.57-.1c.822-.106 1.596-.35 2.295-.81a5.046 5.046 0 001.88-2.207c.186-.42.293-.87.37-1.324.113-.675.138-1.358.137-2.04-.002-3.8 0-7.595-.003-11.393zm-6.423 3.99v5.712c0 .417-.058.827-.244 1.206-.29.59-.76.962-1.388 1.14-.35.1-.706.157-1.07.173-.95.045-1.773-.6-1.943-1.536a1.88 1.88 0 011.038-2.022c.323-.16.67-.25 1.018-.324.378-.082.758-.153 1.134-.24.274-.063.457-.23.51-.516a.904.904 0 00.02-.193c0-1.815 0-3.63-.002-5.443a.725.725 0 00-.026-.185c-.04-.15-.15-.243-.304-.234-.16.01-.318.035-.475.066-.76.15-1.52.303-2.28.456l-2.325.47-1.374.278c-.016.003-.032.01-.048.013-.277.077-.377.203-.39.49-.002.042 0 .086 0 .13-.002 2.602 0 5.204-.003 7.805 0 .42-.047.836-.215 1.227-.278.64-.77 1.04-1.434 1.233-.35.1-.71.16-1.075.172-.96.036-1.755-.6-1.92-1.544-.14-.812.23-1.685 1.154-2.075.357-.15.73-.232 1.108-.31.287-.06.575-.116.86-.177.383-.083.583-.323.6-.714v-.15c0-2.96 0-5.922.002-8.882 0-.123.013-.25.042-.37.07-.285.273-.448.546-.518.255-.066.515-.112.774-.165.733-.15 1.466-.296 2.2-.444l2.27-.46c.67-.134 1.34-.27 2.01-.403.22-.043.442-.088.663-.106.31-.025.523.17.554.482.008.073.012.148.012.223.002 1.91.002 3.822 0 5.732z"/>'
+    },
+    {
+      key: 'spotify',
+      label: 'Spotify',
+      color: '#1ED760',
+      icon: '<path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/>'
+    },
+    {
+      key: 'youtubeMusic',
+      label: 'YouTube Music',
+      color: '#FF0000',
+      icon: '<path d="M12 0C5.376 0 0 5.376 0 12s5.376 12 12 12 12-5.376 12-12S18.624 0 12 0zm0 19.104c-3.924 0-7.104-3.18-7.104-7.104S8.076 4.896 12 4.896s7.104 3.18 7.104 7.104-3.18 7.104-7.104 7.104zm0-13.332c-3.432 0-6.228 2.796-6.228 6.228S8.568 18.228 12 18.228s6.228-2.796 6.228-6.228S15.432 5.772 12 5.772zM9.684 15.54V8.46L15.816 12l-6.132 3.54z"/>'
+    }
+  ];
+
+  function renderTrackLinks(links){
+    if (!links) return '';
+    var parts = [];
+    for (var i = 0; i < STREAM_LINK_ORDER.length; i++){
+      var def = STREAM_LINK_ORDER[i];
+      var url = links[def.key];
+      if (url){
+        parts.push(
+          '<a class="track-link-icon" style="--brand:' + def.color + '" href="' + escapeHtml(url) + '" target="_blank" rel="noopener" aria-label="Listen on ' + def.label + '" title="' + def.label + '">' +
+            '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">' + def.icon + '</svg>' +
+          '</a>'
+        );
+      }
+    }
+    if (!parts.length) return '';
+    return '<div class="track-links"><span class="track-links-label">Stream</span>' + parts.join('') + '</div>';
+  }
+
   function renderTracks(){
     var container = document.getElementById('tracks');
     if (!container) return;
@@ -266,6 +363,7 @@
             '<a href="https://soundcloud.com/insignificant-digits" title="insignificant digits" target="_blank" rel="noopener">insignificant digits</a> &middot; ' +
             '<a href="' + safePermalink + '" title="' + safeTitle + '" target="_blank" rel="noopener">' + safeTitle + '</a>' +
           '</div>' +
+          renderTrackLinks(track.links) +
         '</div>';
     }
     container.innerHTML = html;
@@ -313,18 +411,6 @@
 
   // navy (top of vine) -> pale sky (bottom of vine)
   var PALETTE = ['#141d33', '#2c3f6b', '#4a68a3', '#7f9dcb', '#b8cbe8', '#e4ecf6'];
-
-  // Where fallen flowers come to rest. The wordmark now lives down in the
-  // listen card rather than over the hero, so the ground line no longer
-  // tracks it -- it's a fixed, slightly-raised fraction of the viewport
-  // height instead, leaving clear breathing room below the pile.
-  var groundY = 0;
-
-  function computeGroundY(){
-    var cap = H - 6; // just shy of the true bottom edge, so nothing gets clipped
-    var target = H * (isMobile ? 0.72 : 0.8);
-    return Math.min(cap, Math.max(target, H * 0.45));
-  }
 
   function rand(min, max){ return min + Math.random() * (max - min); }
   function randInt(min, max){ return Math.floor(rand(min, max + 1)); }
@@ -387,12 +473,14 @@
   }
 
   // Ordered lifecycle a flower cycles through, forever, at its own pace:
-  // hidden (dormant on the vine) -> bud (grows in from a point) -> hold (in bloom) ->
-  // fall (drops, sways, tumbles, settles flat) -> land (rests on the ground) ->
-  // fadeout (dissolves) -> hidden again
-  var NEXT_PHASE = { hidden: 'bud', bud: 'hold', hold: 'fall', fall: 'land', land: 'fadeout', fadeout: 'hidden' };
+  // hidden (dormant on the vine) -> bud (grows in from a point) -> hold (in
+  // bloom) -> fall (drops, sways and tumbles all the way off the bottom
+  // edge of the page, fading as it goes) -> hidden again. Nothing ever
+  // settles or piles up; a fallen flower is simply gone, and that vine slot
+  // waits its own random interval before budding again.
+  var NEXT_PHASE = { hidden: 'bud', bud: 'hold', hold: 'fall', fall: 'hidden' };
 
-  function enterPhase(slot, phase, now, groundY){
+  function enterPhase(slot, phase, now){
     slot.phase = phase;
     slot.phaseStart = now;
     switch (phase){
@@ -413,37 +501,32 @@
         slot.holdDuration = rand(2600, 6000);
         break;
       case 'fall':
-        slot.fallDuration = rand(2000, 3400);
+        // Slower than a straight drop -- this is a float/drift, not a fall
+        // under gravity -- so there's time for the sway and bob below to
+        // actually read as floating rather than a quick blur downward.
+        slot.fallDuration = rand(3200, 4800);
         slot.fallFromX = slot.x;
         slot.fallFromY = slot.y;
-        slot.fallToX = slot.x + rand(-30, 30);
-        slot.fallToY = groundY - rand(0, slot.size * 1.3);
-        slot.swayAmp = rand(10, 24);
-        slot.swayFreq = rand(1.1, 2.3);
-        slot.rotPeak = slot.baseRot + rand(-40, 40);
-        slot.rotFlat = rand(-5, 5);
-        break;
-      case 'land':
-        // Shapes rest on the ground for good once they land — this phase
-        // never times out, so they never advance to 'fadeout'.
-        slot.landDuration = Infinity;
-        // Self-heal: usable whether we arrived here via a real fall, or were
-        // seeded directly into 'land' at page-load for initial variety.
-        if (typeof slot.fallToX !== 'number'){
-          slot.fallToX = slot.x + rand(-24, 24);
-          slot.fallToY = groundY - rand(0, slot.size * 1.3);
-        }
-        if (typeof slot.rotFlat !== 'number'){ slot.rotFlat = rand(-5, 5); }
-        slot.restX = slot.fallToX;
-        slot.restY = slot.fallToY;
-        break;
-      case 'fadeout':
-        slot.fadeDuration = 900;
-        if (typeof slot.restX !== 'number'){
-          slot.restX = slot.x + rand(-24, 24);
-          slot.restY = groundY - rand(0, slot.size * 1.3);
-          slot.rotFlat = rand(-5, 5);
-        }
+        slot.fallToX = slot.x + rand(-50, 60);
+        // Comfortably past the bottom edge of the canvas, so it has fully
+        // left the page (not just out of view) before the phase ends.
+        slot.fallToY = H + slot.size * 3 + rand(0, 60);
+        // Side-to-side sway (like a leaf catching air) -- unlike a damped
+        // wobble that straightens out, this keeps going at full amplitude
+        // the whole way down, so the drift is still visibly swaying right
+        // up until it disappears off the bottom edge.
+        slot.swayAmp = rand(24, 48);
+        slot.swayFreq = rand(1.6, 2.8);
+        slot.swayPhase = rand(0, Math.PI * 2);
+        // A smaller, faster vertical flutter layered on top of the sway,
+        // so the path isn't a clean sine curve but a more erratic drift.
+        slot.bobAmp = rand(7, 15);
+        slot.bobFreq = rand(3.2, 5.4);
+        slot.bobPhase = rand(0, Math.PI * 2);
+        // Rotation wobbles in sync with the sway (tilting into the
+        // direction it's drifting), on top of a slow overall tumble.
+        slot.rotPeak = slot.baseRot + rand(-70, 70);
+        slot.rotWobbleAmp = rand(14, 32);
         break;
     }
   }
@@ -454,8 +537,6 @@
       case 'bud': return slot.budDuration;
       case 'hold': return slot.holdDuration;
       case 'fall': return slot.fallDuration;
-      case 'land': return slot.landDuration;
-      case 'fadeout': return slot.fadeDuration;
     }
     return 0;
   }
@@ -463,41 +544,41 @@
   // Advance a slot to its next phase. Falling is metered globally: only
   // MAX_FALLING flowers may be mid-air at once, so a bloom whose time is up
   // just keeps blooming a little longer until a falling "slot" frees up.
-  function tryAdvance(slot, now, groundY){
+  function tryAdvance(slot, now){
     if (slot.phase === 'hold'){
       if (fallingCount < MAX_FALLING){
         fallingCount++;
-        enterPhase(slot, 'fall', now, groundY);
+        enterPhase(slot, 'fall', now);
       } else {
         slot.phaseStart = now;
         slot.holdDuration = rand(500, 1400);
       }
     } else if (slot.phase === 'fall'){
       fallingCount = Math.max(0, fallingCount - 1);
-      enterPhase(slot, 'land', now, groundY);
+      enterPhase(slot, 'hidden', now);
     } else {
-      enterPhase(slot, NEXT_PHASE[slot.phase], now, groundY);
+      enterPhase(slot, NEXT_PHASE[slot.phase], now);
     }
   }
 
-  function updateSlot(slot, now, groundY){
+  function updateSlot(slot, now){
     if (now - slot.phaseStart >= phaseDuration(slot)){
-      tryAdvance(slot, now, groundY);
+      tryAdvance(slot, now);
     }
   }
 
   // The page starts completely bare: every flower begins dormant, with
-  // nothing on the vines and nothing resting on the ground. From there the
-  // burst-aware 'hidden' duration above makes them bud in quickly at first,
-  // then settle into their normal, calmer pace.
-  function makeSlot(x, y, colorT, size, groundY){
+  // nothing on the vines yet. From there the burst-aware 'hidden' duration
+  // above makes them bud in quickly at first, then settle into their
+  // normal, calmer pace.
+  function makeSlot(x, y, colorT, size){
     var slot = { x: x, y: y, colorT: colorT, size: size, baseRot: rand(-10, 10), jitter: makeJitter() };
     var now = performance.now();
-    enterPhase(slot, 'hidden', now, groundY);
+    enterPhase(slot, 'hidden', now);
     return slot;
   }
 
-  function makeColumn(x, groundY){
+  function makeColumn(x){
     // Vines hang from just above the top edge and reach only about halfway
     // down the page, with a ragged, varied bottom edge from column to column.
     var topY = rand(-40, 10);
@@ -546,7 +627,7 @@
         var colorExponent = lerp(4.8, 1.3, distFromCenter) - tpos * 0.9;
         colorExponent = Math.max(0.45, colorExponent);
         var colorT = Math.pow(Math.random(), colorExponent);
-        slots.push(makeSlot(x + xOff, y + yOff, colorT, HEX_SIZE, groundY));
+        slots.push(makeSlot(x + xOff, y + yOff, colorT, HEX_SIZE));
       }
     }
     return { x: x, slots: slots };
@@ -557,7 +638,7 @@
   // on how close the gap is to the horizontal center of the whole piece:
   // shortest at the center (~10% of a vine's depth), longest at the sides
   // (~25%), thinning out to nothing as it goes.
-  function makeFillerColumn(gapX, groundY){
+  function makeFillerColumn(gapX){
     var distFromCenterNorm = W > 0 ? clamp01(Math.abs(gapX - W / 2) / (W / 2)) : 0;
     var depthFraction = lerp(0.25, 0.50, distFromCenterNorm);
     var vineHeightRef = H * 0.48;
@@ -579,7 +660,7 @@
         var yOff = rand(-4, 4);
         // Lighter range only.
         var colorT = rand(0.55, 1.0);
-        slots.push(makeSlot(gapX + xOff, y + yOff, colorT, HEX_SIZE, groundY));
+        slots.push(makeSlot(gapX + xOff, y + yOff, colorT, HEX_SIZE));
       }
     }
     return slots.length ? { x: gapX, slots: slots } : null;
@@ -594,10 +675,9 @@
     // between them instead of merging into one dense mass.
     var colWidth = isMobile ? 130 : 145;
     var count = Math.max(isMobile ? 3 : 6, Math.round(W / colWidth));
-    groundY = computeGroundY();
     for (var i = 0; i < count; i++){
       var x = (i + 0.5) * (W / count) + rand(-8, 8);
-      columns.push(makeColumn(x, groundY));
+      columns.push(makeColumn(x));
     }
     // Filler shapes in the gaps between (and just outside) the vines. Skipped
     // on mobile, where the vines already sit close together and the extra
@@ -605,7 +685,7 @@
     if (!isMobile){
       for (var g = 0; g <= count; g++){
         var gapX = g * (W / count);
-        var filler = makeFillerColumn(gapX, groundY);
+        var filler = makeFillerColumn(gapX);
         if (filler){ columns.push(filler); }
       }
     }
@@ -647,31 +727,28 @@
       }
       case 'fall': {
         var ft = (now - slot.phaseStart) / slot.fallDuration;
-        var e = easeInQuad(ft);
-        x = lerp(slot.fallFromX, slot.fallToX, ft) + Math.sin(ft * Math.PI * slot.swayFreq) * slot.swayAmp * (1 - ft);
-        y = lerp(slot.fallFromY, slot.fallToY, e);
-        scale = lerp(1, 0.9, e);
-        // Tumbles a bit on the way down, then settles flat just before landing.
-        if (ft < 0.72){
-          rot = lerp(slot.baseRot, slot.rotPeak, ft / 0.72);
-        } else {
-          rot = lerp(slot.rotPeak, slot.rotFlat, (ft - 0.72) / 0.28);
-        }
-        break;
-      }
-      case 'land': {
-        x = slot.restX; y = slot.restY; rot = slot.rotFlat; scale = 0.9; alpha = 0.85;
-        // Settles flat over a brief moment right after touching down, like
-        // it's laying itself down on the ground.
-        var settleT = Math.min(1, (now - slot.phaseStart) / 150);
-        squash = lerp(1, 0.42, easeOutQuad(settleT));
-        break;
-      }
-      case 'fadeout': {
-        var xt = (now - slot.phaseStart) / slot.fadeDuration;
-        x = slot.restX; y = slot.restY; rot = slot.rotFlat;
-        scale = 0.9 * (1 - 0.08 * xt); alpha = 0.85 * (1 - xt);
-        squash = 0.42;
+        // Eases in gently from the hold phase's own small bob, so sway and
+        // flutter ramp up smoothly instead of snapping to full amplitude
+        // the instant it starts falling.
+        var wobbleEnv = Math.min(1, ft / 0.12);
+        var sway = Math.sin(ft * Math.PI * slot.swayFreq + slot.swayPhase) * slot.swayAmp * wobbleEnv;
+        var bob = Math.sin(ft * Math.PI * slot.bobFreq + slot.bobPhase) * slot.bobAmp * wobbleEnv;
+        // A fairly even downward drift -- gravity's quadratic pickup would
+        // read as a drop, not a float -- with the sway and bob layered on
+        // top so the path curves and flutters rather than running straight.
+        x = lerp(slot.fallFromX, slot.fallToX, ft) + sway;
+        y = lerp(slot.fallFromY, slot.fallToY, ft) + bob;
+        scale = lerp(1, 0.9, ft);
+        // Tumbles the whole way down, with a wobble synced to the sway so
+        // it tilts into the direction it's drifting, like a leaf catching
+        // air -- there's no ground to settle flat against anymore, so it
+        // just keeps turning and swaying until it's gone.
+        rot = lerp(slot.baseRot, slot.rotPeak, ft) +
+          Math.sin(ft * Math.PI * slot.swayFreq + slot.swayPhase + Math.PI / 2) * slot.rotWobbleAmp * wobbleEnv;
+        // A gentle fade over the back half of the fall, so it dissolves
+        // away rather than hard-cutting the instant it crosses the bottom
+        // edge of the canvas.
+        alpha = 1 - 0.7 * clamp01((ft - 0.55) / 0.45);
         break;
       }
     }
@@ -683,7 +760,7 @@
     for (var c = 0; c < columns.length; c++){
       var slots = columns[c].slots;
       for (var s = 0; s < slots.length; s++){
-        updateSlot(slots[s], now, groundY);
+        updateSlot(slots[s], now);
         drawSlot(slots[s], now);
       }
     }
