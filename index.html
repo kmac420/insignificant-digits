@@ -157,6 +157,28 @@
   .player-credit a:focus-visible{
     text-decoration: underline;
   }
+
+  .site-footer{
+    margin: clamp(32px, 6vh, 56px) 0 0;
+    text-align: center;
+  }
+
+  .site-footer a{
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 0.72rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink-light);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+  }
+
+  .site-footer a:hover,
+  .site-footer a:focus-visible{
+    color: var(--ink);
+    border-bottom-color: var(--ink-light);
+  }
 </style>
 </head>
 <body>
@@ -173,6 +195,8 @@
       <p class="listen-label">Now streaming</p>
       <h2 class="listen-title" id="listen-heading">latest track</h2>
       <div class="tracks" id="tracks"></div>
+
+      <p class="site-footer"><a href="about.html">about</a></p>
     </div>
   </section>
 </main>
@@ -192,22 +216,10 @@
   // optional -- for a new track, `permalink` alone is enough.)
   var TRACKS = [
     {
-      title: 'Sunny Side',
-      permalink: 'https://soundcloud.com/insignificant-digits/sunny-side'
-    },
-    {
-      title: 'Nine Volt',
-      permalink: 'https://soundcloud.com/insignificant-digits/nine-volt'
-    },
-    {
-      title: 'Introvert',
-      permalink: 'https://soundcloud.com/insignificant-digits/introvert'
-    },
-    {
-      title: 'Something Blew',
+      title: 'something blew',
       permalink: 'https://soundcloud.com/insignificant-digits/something-blew',
       embedUrl: 'https://api.soundcloud.com/tracks/soundcloud%3Atracks%3A2351493410'
-    },
+    }
     // {
     //   title: 'another track',
     //   permalink: 'https://soundcloud.com/insignificant-digits/another-track'
