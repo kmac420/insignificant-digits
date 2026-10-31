@@ -16,15 +16,15 @@
 <style>
   :root{
     --bg: #0b0c10;
-    --bg-raised: #15171e;
+    --card: rgba(11, 12, 16, 0.82);
     --ink: #f4f5f7;
-    --ink-light: #9aa2b1;
-    --hairline: rgba(255,255,255,0.09);
+    --ink-light: #a7afbd;
+    --hairline: rgba(255,255,255,0.1);
     --accent: #85a8d1;
   }
 
   *{ box-sizing: border-box; }
-  html, body{ margin:0; padding:0; }
+  html, body{ margin:0; padding:0; height:100%; }
   body{
     background: var(--bg);
     color: var(--ink);
@@ -35,7 +35,79 @@
 
   a{ color: inherit; }
 
-  /* ---------- sticky top bar (appears once the hero scrolls past) ---------- */
+  /* ---------- fixed full-page background photo ---------- */
+
+  .bg{
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 0;
+    background-image: url('hero-bg.jpg');
+    background-size: cover;
+    background-position: 50% 45%;
+    background-color: #1a1c22;
+  }
+
+  .bg::after{
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(8, 9, 12, 0.46);
+  }
+
+  /* Holds open most of a viewport of clear background so the photo reads on
+     its own first -- but a little short of the full 100vh, so the listen
+     card's rounded top edge peeks up into view from the start as a hint
+     that there's more to scroll to. */
+  .bg-spacer{
+    height: calc(100vh - clamp(36px, 8vh, 84px));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  .hero-intro{
+    text-align: center;
+    padding: 0 clamp(20px, 5vw, 56px);
+  }
+
+  .hero-eyebrow{
+    font-weight: 600;
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(244, 245, 247, 0.78);
+    margin: 0 0 1.1rem;
+    text-shadow: 0 1px 10px rgba(0,0,0,0.4);
+  }
+
+  .hero-wordmark{
+    margin: 0 0 0.9rem;
+    line-height: 0;
+  }
+
+  .hero-wordmark img{
+    display: inline-block;
+    width: clamp(150px, 19vw, 260px);
+    height: auto;
+    filter: drop-shadow(0 8px 28px rgba(0,0,0,0.55));
+  }
+
+  .hero-tagline{
+    font-weight: 600;
+    font-size: 0.78rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(244, 245, 247, 0.72);
+    margin: 0;
+    text-shadow: 0 1px 10px rgba(0,0,0,0.4);
+  }
+
+  /* ---------- sticky top bar (appears once the intro has scrolled past) ---------- */
 
   .topbar{
     position: fixed;
@@ -45,7 +117,7 @@
     align-items: center;
     gap: 12px;
     padding: 14px clamp(16px, 4vw, 40px);
-    background: rgba(11, 12, 16, 0.78);
+    background: rgba(11, 12, 16, 0.7);
     -webkit-backdrop-filter: blur(14px);
     backdrop-filter: blur(14px);
     border-bottom: 1px solid var(--hairline);
@@ -57,86 +129,37 @@
 
   .topbar img{
     display: block;
-    height: 18px;
+    height: 34px;
     width: auto;
   }
 
-  /* ---------- hero banner ---------- */
-
-  .hero{
-    position: relative;
-    width: 100%;
-    min-height: clamp(340px, 52vh, 600px);
-    display: flex;
-    align-items: flex-end;
-    background-image: url('hero-bg.jpg');
-    background-size: cover;
-    background-position: 50% 45%;
-    background-color: #1a1c22;
-  }
-
-  .hero::before{
-    content: '';
-    position: absolute;
-    inset: 0;
-    background:
-      linear-gradient(180deg, rgba(8,9,12,0.18) 0%, rgba(8,9,12,0.3) 45%, var(--bg) 100%),
-      rgba(8, 9, 12, 0.14);
-  }
-
-  .hero-content{
-    position: relative;
-    z-index: 1;
-    width: 100%;
-    max-width: 820px;
-    margin: 0 auto;
-    padding: clamp(28px, 6vh, 56px) clamp(20px, 5vw, 56px) clamp(30px, 6vh, 56px);
-    text-align: center;
-  }
-
-  .hero-eyebrow{
-    font-weight: 600;
-    font-size: 0.7rem;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: rgba(244, 245, 247, 0.78);
-    margin: 0 0 1.1rem;
-    text-shadow: 0 1px 10px rgba(0,0,0,0.35);
-  }
-
-  .hero-wordmark{
-    margin: 0 0 0.9rem;
-    line-height: 0;
-  }
-
-  .hero-wordmark img{
-    display: inline-block;
-    width: clamp(260px, 42vw, 600px);
-    height: auto;
-    filter: drop-shadow(0 8px 28px rgba(0,0,0,0.5));
-  }
-
-  .hero-tagline{
-    font-weight: 600;
-    font-size: 0.78rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: rgba(244, 245, 247, 0.72);
-    margin: 0;
-    text-shadow: 0 1px 10px rgba(0,0,0,0.35);
-  }
-
-  /* ---------- main content ---------- */
+  /* ---------- listen section ---------- */
+  /* A floating glass card that rises up over the fixed background photo as
+     the page scrolls, with margin on every side so the image stays visible
+     around it instead of being completely covered. */
 
   main{
     position: relative;
     z-index: 1;
   }
 
-  .content{
-    max-width: 720px;
+  .listen{
+    position: relative;
+    width: calc(100% - 2 * clamp(12px, 4vw, 48px));
+    max-width: 760px;
+    margin: 0 auto clamp(28px, 7vh, 72px);
+    background: var(--card);
+    -webkit-backdrop-filter: blur(18px);
+    backdrop-filter: blur(18px);
+    border: 1px solid var(--hairline);
+    border-radius: 20px;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+    padding: clamp(32px, 6vh, 64px) clamp(20px, 5vw, 48px);
+  }
+
+  .listen-inner{
+    max-width: 680px;
     margin: 0 auto;
-    padding: clamp(40px, 7vh, 72px) clamp(20px, 5vw, 32px) clamp(60px, 10vh, 96px);
   }
 
   .listen-label{
@@ -154,7 +177,7 @@
     font-size: clamp(1.6rem, 4vw, 2.4rem);
     letter-spacing: -0.005em;
     color: var(--ink);
-    margin: 0 0 1.8rem;
+    margin: 0 0 1.6rem;
     text-transform: lowercase;
   }
 
@@ -169,7 +192,7 @@
     overflow: hidden;
     border: 1px solid var(--hairline);
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 16px 40px rgba(0, 0, 0, 0.35);
-    background: var(--bg-raised);
+    background: rgba(0,0,0,0.25);
   }
 
   .player-frame iframe{
@@ -246,10 +269,8 @@
   }
 
   .site-footer{
-    margin: clamp(48px, 8vh, 72px) 0 0;
+    margin: clamp(32px, 6vh, 56px) 0 0;
     text-align: center;
-    border-top: 1px solid var(--hairline);
-    padding-top: clamp(28px, 5vh, 40px);
   }
 
   .site-footer a{
@@ -270,32 +291,36 @@
 
   @media (max-width: 700px){
     .hero-wordmark img{
-      width: clamp(240px, 70vw, 420px);
+      width: clamp(140px, 36vw, 220px);
     }
   }
 </style>
 </head>
 <body>
+<div class="bg" id="bg" aria-hidden="true"></div>
+
 <div class="topbar" id="topbar" aria-hidden="true">
   <img src="insignificant-digits-white.png" alt="insignificant digits" />
 </div>
 
 <main>
-  <div class="hero" id="hero">
-    <div class="hero-content">
+  <div class="bg-spacer" id="bgSpacer" aria-hidden="true">
+    <div class="hero-intro">
       <p class="hero-eyebrow">Artist</p>
       <h1 class="hero-wordmark"><img src="insignificant-digits-white.png" alt="insignificant digits" /></h1>
       <p class="hero-tagline">Toronto &middot; Electronic</p>
     </div>
   </div>
 
-  <div class="content">
-    <p class="listen-label">Now streaming</p>
-    <h2 class="listen-title" id="listen-heading">latest track</h2>
-    <div class="tracks" id="tracks"></div>
+  <section class="listen" aria-labelledby="listen-heading">
+    <div class="listen-inner">
+      <p class="listen-label">Now streaming</p>
+      <h2 class="listen-title" id="listen-heading">latest track</h2>
+      <div class="tracks" id="tracks"></div>
 
-    <p class="site-footer"><a href="about.html">about</a></p>
-  </div>
+      <p class="site-footer"><a href="about.html">about</a></p>
+    </div>
+  </section>
 </main>
 
 <script>
@@ -430,18 +455,18 @@
 (function(){
   "use strict";
 
-  // Slim top bar that fades in once the hero banner has scrolled mostly
+  // Slim top bar that fades in once the hero intro has scrolled mostly
   // out of view, echoing the "sticky artist name" header seen on Apple
   // Music / Spotify artist pages.
   var topbar = document.getElementById('topbar');
-  var hero = document.getElementById('hero');
-  if (!topbar || !hero) return;
+  var spacer = document.getElementById('bgSpacer');
+  if (!topbar || !spacer) return;
 
   var ticking = false;
 
   function update(){
     ticking = false;
-    var threshold = Math.max(120, hero.offsetHeight - 120);
+    var threshold = Math.max(120, spacer.offsetHeight - 120);
     var show = window.scrollY > threshold;
     topbar.classList.toggle('is-visible', show);
   }

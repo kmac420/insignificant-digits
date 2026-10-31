@@ -16,64 +16,113 @@
 <style>
   :root{
     --bg: #0b0c10;
+    --card: rgba(11, 12, 16, 0.82);
     --ink: #f4f5f7;
-    --ink-light: #9aa2b1;
-    --hairline: rgba(255,255,255,0.09);
+    --ink-light: #a7afbd;
+    --hairline: rgba(255,255,255,0.1);
   }
 
   *{ box-sizing: border-box; }
-  html, body{ margin:0; padding:0; min-height:100%; }
+  html, body{ margin:0; padding:0; height:100%; }
   body{
     background: var(--bg);
     color: var(--ink);
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
     -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
   }
 
   a{ color: inherit; }
 
-  /* ---------- hero banner (shorter echo of the home page hero) ---------- */
+  /* ---------- fixed full-page background photo (matches index.html) ---------- */
 
-  .hero{
-    position: relative;
-    width: 100%;
-    min-height: clamp(220px, 32vh, 340px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  .bg{
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 0;
     background-image: url('hero-bg.jpg');
     background-size: cover;
     background-position: 50% 45%;
     background-color: #1a1c22;
   }
 
-  .hero::before{
+  .bg::after{
     content: '';
     position: absolute;
     inset: 0;
     background: rgba(8, 9, 12, 0.46);
   }
 
-  .hero-link{
+  .bg-spacer{
+    height: calc(100vh - clamp(36px, 8vh, 84px));
+    display: flex;
+    align-items: center;
+    justify-content: center;
     position: relative;
     z-index: 1;
+    pointer-events: none;
+  }
+
+  .hero-link{
     display: block;
     line-height: 0;
+    pointer-events: auto;
   }
 
   .hero-link img{
     display: inline-block;
-    width: clamp(200px, 30vw, 320px);
+    width: clamp(140px, 22vw, 220px);
     height: auto;
     filter: drop-shadow(0 8px 24px rgba(0,0,0,0.5));
   }
 
-  /* ---------- content ---------- */
+  /* ---------- sticky top bar (matches index.html) ---------- */
+
+  .topbar{
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px clamp(16px, 4vw, 40px);
+    background: rgba(11, 12, 16, 0.7);
+    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--hairline);
+    transform: translateY(-100%);
+    transition: transform 0.25s ease;
+  }
+
+  .topbar.is-visible{ transform: translateY(0); }
+
+  .topbar img{
+    display: block;
+    height: 34px;
+    width: auto;
+  }
+
+  /* ---------- content card ---------- */
 
   main{
+    position: relative;
+    z-index: 1;
+  }
+
+  .card{
+    position: relative;
+    width: calc(100% - 2 * clamp(12px, 4vw, 48px));
     max-width: 560px;
-    margin: 0 auto;
-    padding: clamp(40px, 7vh, 72px) clamp(20px, 5vw, 32px) clamp(60px, 9vh, 88px);
+    margin: 0 auto clamp(28px, 7vh, 72px);
+    background: var(--card);
+    -webkit-backdrop-filter: blur(18px);
+    backdrop-filter: blur(18px);
+    border: 1px solid var(--hairline);
+    border-radius: 20px;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+    padding: clamp(32px, 6vh, 56px) clamp(24px, 5vw, 48px);
   }
 
   .eyebrow{
@@ -99,14 +148,14 @@
     font-size: 1rem;
     line-height: 1.65;
     color: var(--ink);
-    margin: 0 0 clamp(32px, 6vh, 48px);
+    margin: 0 0 clamp(28px, 5vh, 40px);
   }
 
   .contact{
     display: flex;
     flex-direction: column;
     gap: 0.9rem;
-    padding-top: clamp(24px, 4vh, 32px);
+    padding-top: clamp(20px, 4vh, 28px);
     border-top: 1px solid var(--hairline);
   }
 
@@ -140,10 +189,12 @@
   .back-link{
     display: block;
     text-align: center;
-    margin-top: clamp(40px, 6vh, 56px);
+    margin: 0 auto clamp(48px, 8vh, 72px);
     font-size: 0.85rem;
     color: var(--ink-light);
     text-decoration: none;
+    width: calc(100% - 2 * clamp(12px, 4vw, 48px));
+    max-width: 560px;
   }
 
   .back-link:hover,
@@ -154,23 +205,60 @@
 </style>
 </head>
 <body>
-<div class="hero">
-  <a class="hero-link" href="index.html" aria-label="insignificant digits — home">
-    <img src="insignificant-digits-white.png" alt="insignificant digits" />
-  </a>
+<div class="bg" id="bg" aria-hidden="true"></div>
+
+<div class="topbar" id="topbar" aria-hidden="true">
+  <img src="insignificant-digits-white.png" alt="insignificant digits" />
 </div>
 
 <main>
-  <p class="eyebrow">About</p>
-  <h1 class="title">insignificant digits</h1>
-  <p class="bio">insignificant digits is a Toronto-based intelligent techno music project, built using a hardware-into-Ableton workflow: teenage engineering OP-XY, Moog Minitaur, GS Music Bree6, Elektron Syntakt, teenage engineering TX-6. By day, Kevin McCall is a systems engineering manager; by night, this.</p>
+  <div class="bg-spacer" id="bgSpacer" aria-hidden="true">
+    <a class="hero-link" href="index.html" aria-label="insignificant digits — home">
+      <img src="insignificant-digits-white.png" alt="insignificant digits" />
+    </a>
+  </div>
 
-  <div class="contact">
-    <p class="contact-row"><span class="contact-label">Email</span> <a href="mailto:info@insignificantdigits.com">info@insignificantdigits.com</a></p>
-    <p class="contact-row"><span class="contact-label">X</span> <a href="https://x.com/insig_digits" target="_blank" rel="noopener">x.com/insig_digits</a></p>
+  <div class="card">
+    <p class="eyebrow">About</p>
+    <h1 class="title">insignificant digits</h1>
+    <p class="bio">insignificant digits is a Toronto-based intelligent techno music project, built using a hardware-into-Ableton workflow: teenage engineering OP-XY, Moog Minitaur, GS Music Bree6, Elektron Syntakt, teenage engineering TX-6. By day, Kevin McCall is a systems engineering manager; by night, this.</p>
+
+    <div class="contact">
+      <p class="contact-row"><span class="contact-label">Email</span> <a href="mailto:info@insignificantdigits.com">info@insignificantdigits.com</a></p>
+      <p class="contact-row"><span class="contact-label">X</span> <a href="https://x.com/insig_digits" target="_blank" rel="noopener">x.com/insig_digits</a></p>
+    </div>
   </div>
 
   <a class="back-link" href="index.html">&larr; back to insignificant digits</a>
 </main>
+
+<script>
+(function(){
+  "use strict";
+
+  var topbar = document.getElementById('topbar');
+  var spacer = document.getElementById('bgSpacer');
+  if (!topbar || !spacer) return;
+
+  var ticking = false;
+
+  function update(){
+    ticking = false;
+    var threshold = Math.max(120, spacer.offsetHeight - 120);
+    var show = window.scrollY > threshold;
+    topbar.classList.toggle('is-visible', show);
+  }
+
+  window.addEventListener('scroll', function(){
+    if (!ticking){
+      ticking = true;
+      requestAnimationFrame(update);
+    }
+  }, { passive: true });
+
+  window.addEventListener('resize', update);
+  update();
+})();
+</script>
 </body>
 </html>
