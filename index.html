@@ -4,6 +4,7 @@
 <title>Insignificant Digits</title>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b0c10">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
 <link rel="shortcut icon" href="favicon.ico">
@@ -14,15 +15,16 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@300;500;700;900&family=Inter:wght@400;500;600&display=swap">
 <style>
   :root{
-    --bg: #fafbfd;
-    --bg-listen: #f3f5f9;
-    --ink: #141a2e;
-    --ink-light: #5c6b85;
-    --hairline: #e2e6ee;
+    --bg: #0b0c10;
+    --bg-raised: #15171e;
+    --ink: #f4f5f7;
+    --ink-light: #9aa2b1;
+    --hairline: rgba(255,255,255,0.09);
+    --accent: #85a8d1;
   }
 
   *{ box-sizing: border-box; }
-  html, body{ margin:0; padding:0; height:100%; }
+  html, body{ margin:0; padding:0; }
   body{
     background: var(--bg);
     color: var(--ink);
@@ -31,78 +33,113 @@
     overflow-x: hidden;
   }
 
-  /* ---------- hero / animated vine banner ---------- */
+  a{ color: inherit; }
+
+  /* ---------- sticky top bar (appears once the hero scrolls past) ---------- */
+
+  .topbar{
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px clamp(16px, 4vw, 40px);
+    background: rgba(11, 12, 16, 0.78);
+    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--hairline);
+    transform: translateY(-100%);
+    transition: transform 0.25s ease;
+  }
+
+  .topbar.is-visible{ transform: translateY(0); }
+
+  .topbar img{
+    display: block;
+    height: 18px;
+    width: auto;
+  }
+
+  /* ---------- hero banner ---------- */
 
   .hero{
-    position: fixed;
-    inset: 0;
-    width: 100vw;
-    height: 100vh;
-    background: var(--bg);
-    overflow: hidden;
-    z-index: 0;
+    position: relative;
+    width: 100%;
+    min-height: clamp(340px, 52vh, 600px);
+    display: flex;
+    align-items: flex-end;
+    background-image: url('hero-bg.jpg');
+    background-size: cover;
+    background-position: 50% 45%;
+    background-color: #1a1c22;
   }
 
-  #vineCanvas{
+  .hero::before{
+    content: '';
     position: absolute;
     inset: 0;
+    background:
+      linear-gradient(180deg, rgba(8,9,12,0.18) 0%, rgba(8,9,12,0.3) 45%, var(--bg) 100%),
+      rgba(8, 9, 12, 0.14);
+  }
+
+  .hero-content{
+    position: relative;
+    z-index: 1;
     width: 100%;
-    height: 100%;
-    display: block;
-  }
-
-  /* Holds open most of a viewport of empty (transparent) scroll space so
-     the fixed background above reads clearly first -- but a little short of
-     the full 100vh, so the listen card's rounded top edge peeks up into
-     view from the start as a hint that there's more to scroll to. */
-  .hero-spacer{
-    height: calc(100vh - clamp(36px, 8vh, 84px));
-    pointer-events: none;
-  }
-
-  .wordmark{
-    margin: 0 0 clamp(28px, 4vh, 40px);
-    line-height: 0;
+    max-width: 820px;
+    margin: 0 auto;
+    padding: clamp(28px, 6vh, 56px) clamp(20px, 5vw, 56px) clamp(30px, 6vh, 56px);
     text-align: center;
   }
 
-  .wordmark img{
+  .hero-eyebrow{
+    font-weight: 600;
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(244, 245, 247, 0.78);
+    margin: 0 0 1.1rem;
+    text-shadow: 0 1px 10px rgba(0,0,0,0.35);
+  }
+
+  .hero-wordmark{
+    margin: 0 0 0.9rem;
+    line-height: 0;
+  }
+
+  .hero-wordmark img{
     display: inline-block;
-    width: clamp(280px, 46vw, 640px);
+    width: clamp(260px, 42vw, 600px);
     height: auto;
+    filter: drop-shadow(0 8px 28px rgba(0,0,0,0.5));
   }
 
-  @media (max-width: 700px){
-    .wordmark img{
-      width: clamp(260px, 78vw, 440px);
-    }
+  .hero-tagline{
+    font-weight: 600;
+    font-size: 0.78rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(244, 245, 247, 0.72);
+    margin: 0;
+    text-shadow: 0 1px 10px rgba(0,0,0,0.35);
   }
 
-  /* ---------- listen section ---------- */
-  /* A floating card that rises up over the fixed vine background as the
-     page scrolls, with margin on every side so the animation stays
-     visible around it instead of being completely covered. */
+  /* ---------- main content ---------- */
 
-  .listen{
+  main{
     position: relative;
-    z-index: 2;
-    margin: 0 clamp(12px, 4vw, 48px) clamp(28px, 7vh, 72px);
-    background: rgba(243, 245, 249, 0.92);
-    -webkit-backdrop-filter: blur(14px);
-    backdrop-filter: blur(14px);
-    border: 1px solid var(--hairline);
-    border-radius: 20px;
-    box-shadow: 0 24px 60px rgba(20, 26, 46, 0.16);
-    padding: clamp(40px, 7vh, 88px) clamp(20px, 5vw, 64px);
+    z-index: 1;
   }
 
-  .listen-inner{
+  .content{
     max-width: 720px;
     margin: 0 auto;
+    padding: clamp(40px, 7vh, 72px) clamp(20px, 5vw, 32px) clamp(60px, 10vh, 96px);
   }
 
   .listen-label{
-    font-family: 'Inter', sans-serif;
     font-weight: 600;
     font-size: 0.72rem;
     letter-spacing: 0.16em;
@@ -117,7 +154,7 @@
     font-size: clamp(1.6rem, 4vw, 2.4rem);
     letter-spacing: -0.005em;
     color: var(--ink);
-    margin: 0 0 1.6rem;
+    margin: 0 0 1.8rem;
     text-transform: lowercase;
   }
 
@@ -128,10 +165,11 @@
   }
 
   .player-frame{
-    border-radius: 6px;
+    border-radius: 10px;
     overflow: hidden;
-    box-shadow: 0 1px 2px rgba(20, 26, 46, 0.06), 0 10px 30px rgba(20, 26, 46, 0.07);
-    background: #fff;
+    border: 1px solid var(--hairline);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 16px 40px rgba(0, 0, 0, 0.35);
+    background: var(--bg-raised);
   }
 
   .player-frame iframe{
@@ -190,7 +228,7 @@
     border-radius: 50%;
     background: var(--brand, var(--ink-light));
     color: #fff;
-    box-shadow: 0 1px 2px rgba(20, 26, 46, 0.12);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
     transition: transform 0.15s ease, box-shadow 0.15s ease;
   }
 
@@ -204,16 +242,17 @@
   .track-link-icon:hover,
   .track-link-icon:focus-visible{
     transform: translateY(-1px) scale(1.07);
-    box-shadow: 0 4px 12px rgba(20, 26, 46, 0.2);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
   }
 
   .site-footer{
-    margin: clamp(32px, 6vh, 56px) 0 0;
+    margin: clamp(48px, 8vh, 72px) 0 0;
     text-align: center;
+    border-top: 1px solid var(--hairline);
+    padding-top: clamp(28px, 5vh, 40px);
   }
 
   .site-footer a{
-    font-family: 'Inter', sans-serif;
     font-weight: 600;
     font-size: 0.72rem;
     letter-spacing: 0.16em;
@@ -228,26 +267,35 @@
     color: var(--ink);
     border-bottom-color: var(--ink-light);
   }
+
+  @media (max-width: 700px){
+    .hero-wordmark img{
+      width: clamp(240px, 70vw, 420px);
+    }
+  }
 </style>
 </head>
 <body>
+<div class="topbar" id="topbar" aria-hidden="true">
+  <img src="insignificant-digits-white.png" alt="insignificant digits" />
+</div>
+
 <main>
   <div class="hero" id="hero">
-    <canvas id="vineCanvas" aria-hidden="true"></canvas>
+    <div class="hero-content">
+      <p class="hero-eyebrow">Artist</p>
+      <h1 class="hero-wordmark"><img src="insignificant-digits-white.png" alt="insignificant digits" /></h1>
+      <p class="hero-tagline">Toronto &middot; Electronic</p>
+    </div>
   </div>
 
-  <div class="hero-spacer" aria-hidden="true"></div>
+  <div class="content">
+    <p class="listen-label">Now streaming</p>
+    <h2 class="listen-title" id="listen-heading">latest track</h2>
+    <div class="tracks" id="tracks"></div>
 
-  <section class="listen" aria-labelledby="listen-heading">
-    <div class="listen-inner">
-      <h1 class="wordmark"><img src="insignificant-digits.png" alt="insignificant digits" /></h1>
-      <p class="listen-label">Now streaming</p>
-      <h2 class="listen-title" id="listen-heading">latest track</h2>
-      <div class="tracks" id="tracks"></div>
-
-      <p class="site-footer"><a href="about.html">about</a></p>
-    </div>
-  </section>
+    <p class="site-footer"><a href="about.html">about</a></p>
+  </div>
 </main>
 
 <script>
@@ -359,7 +407,7 @@
       var safeTitle = escapeHtml(track.title);
       var safePermalink = escapeHtml(track.permalink);
       var embedSrc = 'https://w.soundcloud.com/player/?url=' + encodeURIComponent(track.embedUrl || track.permalink) +
-        '&color=%23141a2e&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true';
+        '&color=%2385a8d1&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true';
       html += '<div class="track">' +
           '<div class="player-frame">' +
             '<iframe title="Insignificant Digits - ' + safeTitle + ', SoundCloud player" width="100%" height="300" scrolling="no" frameborder="no" allow="autoplay; encrypted-media" src="' + embedSrc + '"></iframe>' +
@@ -382,466 +430,31 @@
 (function(){
   "use strict";
 
-  var canvas = document.getElementById('vineCanvas');
-  var ctx = canvas.getContext('2d');
-  var heroEl = document.getElementById('hero');
-  var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // Slim top bar that fades in once the hero banner has scrolled mostly
+  // out of view, echoing the "sticky artist name" header seen on Apple
+  // Music / Spotify artist pages.
+  var topbar = document.getElementById('topbar');
+  var hero = document.getElementById('hero');
+  if (!topbar || !hero) return;
 
-  var W = 0, H = 0, dpr = 1;
-  var isMobile = false;
-  var columns = [];
-  var rafId = null;
+  var ticking = false;
 
-  // The width/height the current set of columns was actually built for.
-  // Mobile browsers fire 'resize' constantly as the address bar shows and
-  // hides while scrolling, even though the page hasn't really changed size —
-  // rebuilding the whole vine on every one of those would make the
-  // animation look like it keeps restarting. So layout is only rebuilt when
-  // the size has changed by a meaningful amount (a real resize or rotation),
-  // not for that address-bar jitter.
-  var builtW = 0, builtH = 0;
-
-  // How many flowers may be mid-fall at once, across the whole page.
-  var MAX_FALLING = 2;
-  var fallingCount = 0;
-
-  // The page starts completely bare, then blooms in quickly for the first
-  // several seconds before settling into its normal, calmer pace.
-  var ANIMATION_START = performance.now();
-  var BURST_WINDOW_MS = 7000;
-
-  // Every hexagon is drawn at this same fixed size (a touch smaller on
-  // narrow/mobile screens, set in setupCanvas).
-  var HEX_SIZE = 13;
-
-  // navy (top of vine) -> pale sky (bottom of vine)
-  var PALETTE = ['#141d33', '#2c3f6b', '#4a68a3', '#7f9dcb', '#b8cbe8', '#e4ecf6'];
-
-  function rand(min, max){ return min + Math.random() * (max - min); }
-  function randInt(min, max){ return Math.floor(rand(min, max + 1)); }
-  function lerp(a, b, t){ return a + (b - a) * t; }
-  function clamp01(v){ return v < 0 ? 0 : (v > 1 ? 1 : v); }
-  function clampByte(v){ v = Math.round(v); return v < 0 ? 0 : (v > 255 ? 255 : v); }
-
-  function hexToRgb(hex){
-    var n = parseInt(hex.replace('#', ''), 16);
-    return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
-  }
-  var PALETTE_RGB = PALETTE.map(hexToRgb);
-
-  function colorAt(t){
-    t = clamp01(t);
-    var segF = t * (PALETTE_RGB.length - 1);
-    var i = Math.min(PALETTE_RGB.length - 2, Math.floor(segF));
-    var lt = segF - i;
-    var c1 = PALETTE_RGB[i], c2 = PALETTE_RGB[i + 1];
-    return [lerp(c1[0], c2[0], lt), lerp(c1[1], c2[1], lt), lerp(c1[2], c2[2], lt)];
+  function update(){
+    ticking = false;
+    var threshold = Math.max(120, hero.offsetHeight - 120);
+    var show = window.scrollY > threshold;
+    topbar.classList.toggle('is-visible', show);
   }
 
-  function easeOutBack(t){
-    var c1 = 1.70158, c3 = c1 + 1;
-    return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2);
-  }
-  function easeInQuad(t){ return t * t; }
-  function easeOutQuad(t){ return 1 - (1 - t) * (1 - t); }
-
-  // ---- hexagon geometry (a single rounded hex path, not a cluster of dots) ----
-  var HEX_ANGLES = [-90, -30, 30, 90, 150, 210].map(function(d){ return d * Math.PI / 180; });
-
-  function hexVertices(r){
-    return HEX_ANGLES.map(function(a){ return { x: Math.cos(a) * r, y: Math.sin(a) * r }; });
-  }
-
-  function normalize(dx, dy){
-    var len = Math.hypot(dx, dy) || 1;
-    return { x: dx / len, y: dy / len };
-  }
-
-  function roundedPolygonPath(ctx2, points, radius){
-    var n = points.length;
-    for (var i = 0; i < n; i++){
-      var curr = points[i];
-      var next = points[(i + 1) % n];
-      var prev = points[(i - 1 + n) % n];
-      var toNext = normalize(next.x - curr.x, next.y - curr.y);
-      var toPrev = normalize(prev.x - curr.x, prev.y - curr.y);
-      var p1 = { x: curr.x + toPrev.x * radius, y: curr.y + toPrev.y * radius };
-      var p2 = { x: curr.x + toNext.x * radius, y: curr.y + toNext.y * radius };
-      if (i === 0){ ctx2.moveTo(p1.x, p1.y); } else { ctx2.lineTo(p1.x, p1.y); }
-      ctx2.quadraticCurveTo(curr.x, curr.y, p2.x, p2.y);
+  window.addEventListener('scroll', function(){
+    if (!ticking){
+      ticking = true;
+      requestAnimationFrame(update);
     }
-    ctx2.closePath();
-  }
+  }, { passive: true });
 
-  function makeJitter(){
-    return { dAlpha: rand(-0.06, 0.06), dColor: rand(-10, 10) };
-  }
-
-  // Ordered lifecycle a flower cycles through, forever, at its own pace:
-  // hidden (dormant on the vine) -> bud (grows in from a point) -> hold (in
-  // bloom) -> fall (drops, sways and tumbles all the way off the bottom
-  // edge of the page, fading as it goes) -> hidden again. Nothing ever
-  // settles or piles up; a fallen flower is simply gone, and that vine slot
-  // waits its own random interval before budding again.
-  var NEXT_PHASE = { hidden: 'bud', bud: 'hold', hold: 'fall', fall: 'hidden' };
-
-  function enterPhase(slot, phase, now){
-    slot.phase = phase;
-    slot.phaseStart = now;
-    switch (phase){
-      case 'hidden':
-        // For the first several seconds after the page loads, flowers bud in
-        // much more rapidly; afterward the pace settles down to normal.
-        if (now - ANIMATION_START < BURST_WINDOW_MS){
-          slot.hiddenDuration = rand(60, 1100);
-        } else {
-          slot.hiddenDuration = rand(500, 3600);
-        }
-        break;
-      case 'bud':
-        slot.budDuration = rand(550, 950);
-        slot.jitter = makeJitter();
-        break;
-      case 'hold':
-        slot.holdDuration = rand(2600, 6000);
-        break;
-      case 'fall':
-        // Slower than a straight drop -- this is a float/drift, not a fall
-        // under gravity -- so there's time for the sway and bob below to
-        // actually read as floating rather than a quick blur downward.
-        slot.fallDuration = rand(3200, 4800);
-        slot.fallFromX = slot.x;
-        slot.fallFromY = slot.y;
-        slot.fallToX = slot.x + rand(-50, 60);
-        // Comfortably past the bottom edge of the canvas, so it has fully
-        // left the page (not just out of view) before the phase ends.
-        slot.fallToY = H + slot.size * 3 + rand(0, 60);
-        // Side-to-side sway (like a leaf catching air) -- unlike a damped
-        // wobble that straightens out, this keeps going at full amplitude
-        // the whole way down, so the drift is still visibly swaying right
-        // up until it disappears off the bottom edge.
-        slot.swayAmp = rand(24, 48);
-        slot.swayFreq = rand(1.6, 2.8);
-        slot.swayPhase = rand(0, Math.PI * 2);
-        // A smaller, faster vertical flutter layered on top of the sway,
-        // so the path isn't a clean sine curve but a more erratic drift.
-        slot.bobAmp = rand(7, 15);
-        slot.bobFreq = rand(3.2, 5.4);
-        slot.bobPhase = rand(0, Math.PI * 2);
-        // Rotation wobbles in sync with the sway (tilting into the
-        // direction it's drifting), on top of a slow overall tumble.
-        slot.rotPeak = slot.baseRot + rand(-70, 70);
-        slot.rotWobbleAmp = rand(14, 32);
-        break;
-    }
-  }
-
-  function phaseDuration(slot){
-    switch (slot.phase){
-      case 'hidden': return slot.hiddenDuration;
-      case 'bud': return slot.budDuration;
-      case 'hold': return slot.holdDuration;
-      case 'fall': return slot.fallDuration;
-    }
-    return 0;
-  }
-
-  // Advance a slot to its next phase. Falling is metered globally: only
-  // MAX_FALLING flowers may be mid-air at once, so a bloom whose time is up
-  // just keeps blooming a little longer until a falling "slot" frees up.
-  function tryAdvance(slot, now){
-    if (slot.phase === 'hold'){
-      if (fallingCount < MAX_FALLING){
-        fallingCount++;
-        enterPhase(slot, 'fall', now);
-      } else {
-        slot.phaseStart = now;
-        slot.holdDuration = rand(500, 1400);
-      }
-    } else if (slot.phase === 'fall'){
-      fallingCount = Math.max(0, fallingCount - 1);
-      enterPhase(slot, 'hidden', now);
-    } else {
-      enterPhase(slot, NEXT_PHASE[slot.phase], now);
-    }
-  }
-
-  function updateSlot(slot, now){
-    if (now - slot.phaseStart >= phaseDuration(slot)){
-      tryAdvance(slot, now);
-    }
-  }
-
-  // The page starts completely bare: every flower begins dormant, with
-  // nothing on the vines yet. From there the burst-aware 'hidden' duration
-  // above makes them bud in quickly at first, then settle into their
-  // normal, calmer pace.
-  function makeSlot(x, y, colorT, size){
-    var slot = { x: x, y: y, colorT: colorT, size: size, baseRot: rand(-10, 10), jitter: makeJitter() };
-    var now = performance.now();
-    enterPhase(slot, 'hidden', now);
-    return slot;
-  }
-
-  function makeColumn(x){
-    // Vines hang from just above the top edge and reach only about halfway
-    // down the page, with a ragged, varied bottom edge from column to column.
-    var topY = rand(-40, 10);
-    // Narrowed toward the denser end (higher minimum), while the sparsest
-    // vines never get sparser than before (same upper bound).
-    var bottomY = H * rand(0.46, 0.56);
-    var vineLength = Math.max(40, bottomY - topY);
-    // Rows have some air between them rather than tightly overlapping, so
-    // patches of bare page show through the vine, like the reference image.
-    var spacingFactor = rand(0.62, 0.76);
-    var spacing = Math.max(7, HEX_SIZE * 2 * spacingFactor);
-    var numRows = Math.max(6, Math.round(vineLength / spacing));
-    // The vine is wide and busy near the top, and tapers down to a narrow,
-    // sparse tip toward its lower end. Narrower on mobile so neighboring
-    // vines (which sit closer together on a slim screen) stay visually
-    // distinct instead of merging into a solid mass.
-    var topSpread = isMobile ? rand(1.7, 2.1) : rand(2.9, 3.4);
-    var tipSpread = isMobile ? rand(0.18, 0.3) : rand(0.22, 0.4);
-    // About five shapes wide at the top, tapering to one or two at the tip
-    // (fewer on mobile, to keep the total shape count in check).
-    var maxShapesPerRow = isMobile ? randInt(3, 4) : randInt(5, 6);
-    var tipShapesPerRow = isMobile ? 1 : randInt(1, 2);
-    var slots = [];
-    for (var s = 0; s < numRows; s++){
-      var tpos = numRows === 1 ? 0 : s / (numRows - 1);
-      var y = lerp(topY, bottomY, tpos) + rand(-3, 3);
-      var spread = lerp(topSpread, tipSpread, tpos);
-      var shapesInRow = Math.max(1, Math.round(lerp(maxShapesPerRow, tipShapesPerRow, tpos) + rand(-0.4, 0.4)));
-      var halfWidth = HEX_SIZE * spread;
-      // Target positions are evenly spaced across the row's width, but a
-      // wide, uneven jitter is layered on top: some neighbors end up
-      // overlapping, others leave a small visible gap, instead of a
-      // perfectly uniform comb. The jitter scales with the row's own width,
-      // so it stays proportionate as rows narrow toward the tip.
-      var slotGap = shapesInRow > 1 ? (2 * halfWidth) / (shapesInRow - 1) : 0;
-      var jitterRange = slotGap * 0.6 + halfWidth * 0.35 + HEX_SIZE * 0.35;
-      for (var k = 0; k < shapesInRow; k++){
-        // A lone shape in a row doesn't have to sit right on the centerline.
-        var baseX = shapesInRow === 1 ? rand(-1, 1) * halfWidth * 0.6 : lerp(-halfWidth, halfWidth, k / (shapesInRow - 1));
-        var xOff = baseX + rand(-1, 1) * jitterRange;
-        var yOff = rand(-6, 6);
-        // Color still varies shape-to-shape, and leans darker near the
-        // vine's horizontal centerline and lighter toward its outer edges,
-        // plus a gentle overall lightening further down the vine.
-        var distFromCenter = halfWidth > 0 ? clamp01(Math.abs(baseX) / halfWidth) : 0;
-        var colorExponent = lerp(4.8, 1.3, distFromCenter) - tpos * 0.9;
-        colorExponent = Math.max(0.45, colorExponent);
-        var colorT = Math.pow(Math.random(), colorExponent);
-        slots.push(makeSlot(x + xOff, y + yOff, colorT, HEX_SIZE));
-      }
-    }
-    return { x: x, slots: slots };
-  }
-
-  // A short, light-colored scattering of shapes in the gap between two
-  // vines, confined to the top of the page. How far down it reaches depends
-  // on how close the gap is to the horizontal center of the whole piece:
-  // shortest at the center (~10% of a vine's depth), longest at the sides
-  // (~25%), thinning out to nothing as it goes.
-  function makeFillerColumn(gapX){
-    var distFromCenterNorm = W > 0 ? clamp01(Math.abs(gapX - W / 2) / (W / 2)) : 0;
-    var depthFraction = lerp(0.25, 0.50, distFromCenterNorm);
-    var vineHeightRef = H * 0.48;
-    var maxDepth = vineHeightRef * depthFraction;
-    if (maxDepth < 16) return null;
-    var topY = rand(-20, 6);
-    var bottomY = topY + maxDepth;
-    // Tighter row spacing and more shapes per row than before, packed into
-    // the same depth range rather than reaching any further down.
-    var spacing = HEX_SIZE * 2 * rand(0.5, 0.75);
-    var numRows = Math.max(3, Math.round(maxDepth / spacing));
-    var slots = [];
-    for (var s = 0; s < numRows; s++){
-      var tpos = numRows === 1 ? 0 : s / (numRows - 1);
-      var y = lerp(topY, bottomY, tpos) + rand(-3, 3);
-      var countHere = Math.round(lerp(4, 0, tpos) + rand(-0.4, 0.4));
-      for (var k = 0; k < countHere; k++){
-        var xOff = rand(-1, 1) * 22;
-        var yOff = rand(-4, 4);
-        // Lighter range only.
-        var colorT = rand(0.55, 1.0);
-        slots.push(makeSlot(gapX + xOff, y + yOff, colorT, HEX_SIZE));
-      }
-    }
-    return slots.length ? { x: gapX, slots: slots } : null;
-  }
-
-  function buildColumns(){
-    columns = [];
-    fallingCount = 0;
-    // Fewer, wider-spaced vines, each with more room to spread out. On
-    // narrow/mobile screens the vines themselves are also narrower (see
-    // makeColumn), so a smaller minimum count still leaves clear gaps
-    // between them instead of merging into one dense mass.
-    var colWidth = isMobile ? 130 : 145;
-    var count = Math.max(isMobile ? 3 : 6, Math.round(W / colWidth));
-    for (var i = 0; i < count; i++){
-      var x = (i + 0.5) * (W / count) + rand(-8, 8);
-      columns.push(makeColumn(x));
-    }
-    // Filler shapes in the gaps between (and just outside) the vines. Skipped
-    // on mobile, where the vines already sit close together and the extra
-    // shapes just read as clutter rather than "in-between" texture.
-    if (!isMobile){
-      for (var g = 0; g <= count; g++){
-        var gapX = g * (W / count);
-        var filler = makeFillerColumn(gapX);
-        if (filler){ columns.push(filler); }
-      }
-    }
-  }
-
-  function drawHexShape(x, y, r, colorT, alpha, scale, rot, jitter, squash){
-    if (alpha <= 0.01 || scale <= 0.001) return;
-    var rgb = colorAt(colorT);
-    ctx.save();
-    ctx.translate(x, y);
-    ctx.rotate(rot * Math.PI / 180);
-    // squash < 1 flattens the hexagon vertically, so it reads as lying flat
-    // on the ground rather than standing upright facing the viewer.
-    ctx.scale(scale, scale * (typeof squash === 'number' ? squash : 1));
-    ctx.beginPath();
-    roundedPolygonPath(ctx, hexVertices(r), r * 0.24);
-    ctx.fillStyle = 'rgba(' + clampByte(rgb[0] + jitter.dColor) + ',' + clampByte(rgb[1] + jitter.dColor) + ',' + clampByte(rgb[2] + jitter.dColor) + ',' + clamp01(alpha * (0.94 + jitter.dAlpha)) + ')';
-    ctx.fill();
-    ctx.restore();
-  }
-
-  function drawSlot(slot, now){
-    var x, y, scale = 1, alpha = 1, rot = slot.baseRot, squash = 1;
-    switch (slot.phase){
-      case 'hidden':
-        return;
-      case 'bud': {
-        // Budding is simply the hexagon expanding outward from a point.
-        var t = Math.min(1, (now - slot.phaseStart) / slot.budDuration);
-        scale = Math.max(0, easeOutBack(t));
-        alpha = Math.min(1, t * 1.4);
-        x = slot.x; y = slot.y;
-        break;
-      }
-      case 'hold': {
-        var bob = Math.sin((now + slot.x * 13) / 900) * 1.6;
-        x = slot.x; y = slot.y + bob;
-        break;
-      }
-      case 'fall': {
-        var ft = (now - slot.phaseStart) / slot.fallDuration;
-        // Eases in gently from the hold phase's own small bob, so sway and
-        // flutter ramp up smoothly instead of snapping to full amplitude
-        // the instant it starts falling.
-        var wobbleEnv = Math.min(1, ft / 0.12);
-        var sway = Math.sin(ft * Math.PI * slot.swayFreq + slot.swayPhase) * slot.swayAmp * wobbleEnv;
-        var bob = Math.sin(ft * Math.PI * slot.bobFreq + slot.bobPhase) * slot.bobAmp * wobbleEnv;
-        // A fairly even downward drift -- gravity's quadratic pickup would
-        // read as a drop, not a float -- with the sway and bob layered on
-        // top so the path curves and flutters rather than running straight.
-        x = lerp(slot.fallFromX, slot.fallToX, ft) + sway;
-        y = lerp(slot.fallFromY, slot.fallToY, ft) + bob;
-        scale = lerp(1, 0.9, ft);
-        // Tumbles the whole way down, with a wobble synced to the sway so
-        // it tilts into the direction it's drifting, like a leaf catching
-        // air -- there's no ground to settle flat against anymore, so it
-        // just keeps turning and swaying until it's gone.
-        rot = lerp(slot.baseRot, slot.rotPeak, ft) +
-          Math.sin(ft * Math.PI * slot.swayFreq + slot.swayPhase + Math.PI / 2) * slot.rotWobbleAmp * wobbleEnv;
-        // A gentle fade over the back half of the fall, so it dissolves
-        // away rather than hard-cutting the instant it crosses the bottom
-        // edge of the canvas.
-        alpha = 1 - 0.7 * clamp01((ft - 0.55) / 0.45);
-        break;
-      }
-    }
-    drawHexShape(x, y, slot.size, slot.colorT, alpha, scale, rot, slot.jitter, squash);
-  }
-
-  function frame(now){
-    ctx.clearRect(0, 0, W, H);
-    for (var c = 0; c < columns.length; c++){
-      var slots = columns[c].slots;
-      for (var s = 0; s < slots.length; s++){
-        updateSlot(slots[s], now);
-        drawSlot(slots[s], now);
-      }
-    }
-    rafId = requestAnimationFrame(frame);
-  }
-
-  function setupCanvas(){
-    var rect = heroEl.getBoundingClientRect();
-    W = Math.max(1, Math.floor(rect.width));
-    H = Math.max(1, Math.floor(rect.height));
-    isMobile = W < 700;
-    HEX_SIZE = isMobile ? 11 : 13;
-    dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
-    canvas.width = Math.floor(W * dpr);
-    canvas.height = Math.floor(H * dpr);
-    canvas.style.width = W + 'px';
-    canvas.style.height = H + 'px';
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-
-    // Only rebuild the vine layout (which resets every flower to dormant)
-    // on a real size change, not on the small height wobble mobile browser
-    // chrome causes while scrolling.
-    var widthChanged = Math.abs(W - builtW) > 2;
-    var heightChanged = Math.abs(H - builtH) > 120;
-    if (columns.length === 0 || widthChanged || heightChanged){
-      buildColumns();
-      builtW = W;
-      builtH = H;
-    }
-  }
-
-  function renderStatic(){
-    var now = performance.now();
-    for (var c = 0; c < columns.length; c++){
-      var slots = columns[c].slots;
-      for (var s = 0; s < slots.length; s++){
-        var slot = slots[s];
-        slot.phase = 'hold';
-        slot.phaseStart = now - 100000;
-        slot.holdDuration = Number.MAX_SAFE_INTEGER;
-      }
-    }
-    ctx.clearRect(0, 0, W, H);
-    for (var c2 = 0; c2 < columns.length; c2++){
-      var slots2 = columns[c2].slots;
-      for (var s2 = 0; s2 < slots2.length; s2++){
-        drawSlot(slots2[s2], now);
-      }
-    }
-  }
-
-  function init(){
-    setupCanvas();
-    if (rafId){ cancelAnimationFrame(rafId); rafId = null; }
-    if (reducedMotion){
-      renderStatic();
-    } else {
-      rafId = requestAnimationFrame(frame);
-    }
-  }
-
-  var resizeTimer = null;
-  window.addEventListener('resize', function(){
-    clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(init, 200);
-  });
-
-  if (document.fonts && document.fonts.ready){
-    document.fonts.ready.then(init).catch(init);
-  } else {
-    init();
-  }
-  window.addEventListener('load', function(){
-    // re-init once after full load in case webfonts shifted layout metrics
-    setTimeout(init, 60);
-  });
+  window.addEventListener('resize', update);
+  update();
 })();
 </script>
 </body>
